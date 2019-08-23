@@ -14,8 +14,9 @@
     "start": "env NODE_ENV=production node_modules/.bin/rollup -c"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
+    "fuzzysort": "^1.1.4",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "sucrase": "^3.10.1"
