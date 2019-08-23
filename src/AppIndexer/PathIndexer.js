@@ -3,6 +3,10 @@ import AppIndex from '../Models/AppIndex'
 import AppIndexer from './AppIndexer'
 import path from 'path'
 
+/**
+ * Creates application indexes from the PATH env variable
+ */
+
 class PathIndexer extends AppIndexer {
     
 
