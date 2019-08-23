@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron'
 class ApplicationLauncherRow extends React.PureComponent {
 
     handleStart = () => {
-        spawn(this.props.appIndex.path, { detached: true, stdio: 'ignore' }).unref()
+        spawn(this.props.appIndex.exec, { detached: true, stdio: 'ignore' }).unref()
 
         // hide Vonal
         ipcRenderer.send('hide')

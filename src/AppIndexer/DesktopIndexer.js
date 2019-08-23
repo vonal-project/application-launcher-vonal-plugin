@@ -4,24 +4,23 @@ import AppIndexer from './AppIndexer'
 import path from 'path'
 
 /**
- * Creates application indexes from the PATH env variable
+ * Creates application indexes from .desktop files
  */
 
-class PathIndexer extends AppIndexer {
+class DesktopIndexer extends AppIndexer {
     
-
+    /**
+     * These files usually reside in 
+     * /usr/share/applications/ or /usr/local/share/applications/ for applications installed system-wide, 
+     * or ~/.local/share/applications/  for user-specific applications. 
+     * User entries take precedence over system entries.
+     */
     async index() {
-        let dirsToIndex = process.env.PATH.split(':')
-
-        let indices = []
-
-        for(let dir of dirsToIndex)
-            indices = [
-                ...indices,
-                ...await this._indexFrom(dir)
-            ]
-
-        return indices
+        return [
+            ...await this._indexFrom('~/.local/share/applications/'),
+            ...await this._indexFrom('/usr/share/applications/'),
+            ...await this._indexFrom('/usr/local/share/applications/')
+        ]
     }
 
     /**
@@ -57,4 +56,4 @@ class PathIndexer extends AppIndexer {
     }
 }
 
-export default PathIndexer
+export default DesktopIndexer
