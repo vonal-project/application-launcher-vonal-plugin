@@ -1,6 +1,6 @@
 {
   "name": "example-vonal-test",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "An example of how to make a plugin to the Vonal launcher.",
   "main": "index.built.js",
   "devDependencies": {
