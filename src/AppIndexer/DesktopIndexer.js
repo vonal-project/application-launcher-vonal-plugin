@@ -2,13 +2,13 @@ import fs, { promises as fsp } from 'fs'
 import AppIndex from '../Models/AppIndex'
 import AppIndexer from './AppIndexer'
 import path from 'path'
-
+import XDGParse from 'xdg-parse'
 /**
  * Creates application indexes from .desktop files
  */
 
 class DesktopIndexer extends AppIndexer {
-    
+
     /**
      * These files usually reside in 
      * /usr/share/applications/ or /usr/local/share/applications/ for applications installed system-wide, 
@@ -29,29 +29,63 @@ class DesktopIndexer extends AppIndexer {
      */
     async _indexFrom(from) {
         try {
-            let entries = await fsp.readdir(from)
+            let realPathFrom = fs.realpathSync(from)
+            let entries = await fsp.readdir(realPathFrom)
             return entries
-                .filter(async entry => this._isExecutable(
-                    path.join(from, entry)
-                ))
-                .map(entry => new AppIndex({
-                    name: entry,
-                    exec: path.join(from, entry),
-                    path: from
-                }))
-        } catch(e) {
+                .filter(entry => entry.match(/\.desktop$/))
+                .map(entry => 
+                    fs.readFileSync(path.join(realPathFrom, entry), 'utf8')
+                )
+                .map(content => XDGParse(content))
+                .map(parsed => this._makeAppIndexFromParsedDesktopFile(parsed, 'Desktop Entry'))
+
+        } catch (e) {
             return []
         }
     }
 
-    async _isExecutable(filePath) {
-        try {
-            return await fsp.access(
-                filePath,
-                fs.constants.X_OK
-            )
-        } catch(e) {
-            return false
+    /**
+     * 
+     * @param {Object} content 
+     */
+    _makeAppIndexFromParsedDesktopFile(content, entry) {
+        let mainEntry = content[entry]
+        if (mainEntry) {
+            if(!mainEntry.Actions) mainEntry.Actions = ''
+            if(!mainEntry.MimeType) mainEntry.MimeType = ''
+            if(!mainEntry.Actions) mainEntry.Actions = ''
+            if(!mainEntry.Categories) mainEntry.Categories = ''
+            if(!mainEntry.Implements) mainEntry.Implements = ''
+            if(!mainEntry.Keywords) mainEntry.Keywords = ''
+            if(!mainEntry.NoDisplay) mainEntry.NoDisplay = 'false'
+            if(!mainEntry.DBusActivatable) mainEntry.DBusActivatable = 'false'
+            if(!mainEntry.StartupNotify) mainEntry.StartupNotify = 'false'
+
+            return new AppIndex({
+                name: mainEntry.Name,
+                path: mainEntry.Path,
+                version: mainEntry.Version,
+                genericName: mainEntry.GenericName,
+                noDisplay: (mainEntry.NoDisplay == 'true') ? true : false,
+                comment: mainEntry.Comment,
+                icon: mainEntry.Icon,
+                dBusActivatable: (mainEntry.DBusActivatable == 'true') ? true : false,
+                tryExec: mainEntry.TryExec,
+                exec: mainEntry.Exec,
+                terminal: mainEntry.Terminal,
+                actions: mainEntry.Actions
+                    .split(';')
+                    .map(action =>
+                        this._makeAppIndexFromParsedDesktopFile(content, 'Desktop Action ' + action)
+                    ),
+                mimeType: mainEntry.MimeType.split(';'),
+                categories: mainEntry.Categories.split(';'),
+                implements: mainEntry.Implements.split(';'),
+                keywords: mainEntry.Keywords.split(';'),
+                startupNotify: (mainEntry.StartupNotify == 'true') ? true : false,
+                startupWMClass: mainEntry.StartupWMClass,
+                URL: mainEntry.URL
+            })
         }
     }
 }

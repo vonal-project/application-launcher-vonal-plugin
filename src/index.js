@@ -2,9 +2,11 @@ import fuzzysort from 'fuzzysort'
 import ApplicationLauncherRow from './Components/ApplicationLauncherRow'
 import PathIndexer from './AppIndexer/PathIndexer'
 import ApplicationCacher from './ApplicationCacher/ApplicationCacher';
+import DesktopIndexer from './AppIndexer/DesktopIndexer';
 
 let pathIndexer = new PathIndexer()
-let applicationCacher = new ApplicationCacher([pathIndexer])
+let desktopIndexer = new DesktopIndexer()
+let applicationCacher = new ApplicationCacher([pathIndexer, desktopIndexer])
 let indices = null
 
 let load_cache = () => {

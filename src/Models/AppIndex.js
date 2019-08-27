@@ -12,7 +12,6 @@ class AppIndex {
      * @param {Object} app
      * @param {String} app.name Specific name of the application, for example "Mozilla".
      * @param {String} app.path If entry is of type Application, the working directory to run the program in.
-     * @param {AppIndex~type} app.type
      * @param {String} app.version Version of the Desktop Entry Specification
      * @param {String} app.genericName Generic name of the application, for example "Web Browser".
      * @param {Boolean} app.noDisplay NoDisplay means "this application exists, but don't display it in the menus"
@@ -41,7 +40,7 @@ class AppIndex {
      * 
      * @param {String} app.path If entry is of type Application, the working directory to run the program in.
      * @param {Boolean} app.terminal Whether the program runs in a terminal window.
-     * @param {String[]} app.actions Identifiers for application actions. 
+     * @param {AppIndex[]} app.actions Application actions. 
      * This can be used to tell the application to make a specific action, different from the default behavior. 
      * The Application actions section describes how actions work.
      * 
@@ -71,6 +70,7 @@ class AppIndex {
      * (see the Startup Notification Protocol Specification for more details).
      * 
      * @param {String} app.URL If entry is Link type, the URL to access.
+     * @param {AppIndex~type} app.type
      */
     constructor(app){
         this.name = app.name

@@ -30,15 +30,16 @@ class PathIndexer extends AppIndexer {
      */
     async _indexFrom(from) {
         try {
-            let entries = await fsp.readdir(from)
+            let realPathFrom = fs.realpathSync(from)
+            let entries = await fsp.readdir(realPathFrom)
             return entries
                 .filter(async entry => this._isExecutable(
-                    path.join(from, entry)
+                    path.join(realPathFrom, entry)
                 ))
                 .map(entry => new AppIndex({
                     name: entry,
-                    exec: path.join(from, entry),
-                    path: from
+                    exec: path.join(realPathFrom, entry),
+                    path: realPathFrom
                 }))
         } catch(e) {
             return []
