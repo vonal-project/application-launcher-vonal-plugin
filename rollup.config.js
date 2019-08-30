@@ -4,7 +4,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 
 export default {
-    input: ['./src/index.js'],
+    input: ['./src/index.tsx'],
     output: {
         file: 'index.built.js',
         format: 'cjs',
@@ -14,9 +14,10 @@ export default {
          * rewrite imports to node_modules/{lib_name}
          */
         resolve({
-            preferBuiltins: false,
+            extensions: ['.js', '.ts', '.tsx' ],
+            //preferBuiltins: false,
             dedupe: ['react', 'react-dom'],
-            only: ['(!?electron)']
+            //only: ['(!?electron)']
         }),
         /**
          * Tell rollup that these are in commonjs format 
@@ -29,11 +30,7 @@ export default {
          */
         sucrase({
             exclude: ['node_modules/**'],
-            transforms: ['jsx']
-        }),
-    ],
-    externals: [
-        'fs',
-        'path'
+            transforms: ['typescript', 'jsx']
+        })
     ]
 }

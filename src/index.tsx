@@ -3,6 +3,7 @@ import ApplicationLauncherRow from './Components/ApplicationLauncherRow'
 import PathIndexer from './AppIndexer/PathIndexer'
 import ApplicationCacher from './ApplicationCacher/ApplicationCacher';
 import DesktopIndexer from './AppIndexer/DesktopIndexer';
+import AppIndex from './Models/AppIndex';
 
 let pathIndexer = new PathIndexer()
 let desktopIndexer = new DesktopIndexer()
@@ -24,7 +25,7 @@ load_cache()
 async function getResults(q) {
     if(!indices) return null
 
-    let results = fuzzysort.go(q, indices, { key: 'name' })
+    let results : Fuzzysort.KeyResults<AppIndex> = fuzzysort.go(q, indices, { key: 'name' })
     return results
 }
 

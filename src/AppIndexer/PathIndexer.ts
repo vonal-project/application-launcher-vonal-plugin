@@ -7,15 +7,15 @@ import path from 'path'
  * Creates application indexes from the PATH env variable
  */
 
-class PathIndexer extends AppIndexer {
-    
+class PathIndexer implements AppIndexer {
+
 
     async index() {
         let dirsToIndex = process.env.PATH.split(':')
 
         let indices = []
 
-        for(let dir of dirsToIndex)
+        for (let dir of dirsToIndex)
             indices = [
                 ...indices,
                 ...await this._indexFrom(dir)
@@ -36,12 +36,20 @@ class PathIndexer extends AppIndexer {
                 .filter(async entry => this._isExecutable(
                     path.join(realPathFrom, entry)
                 ))
-                .map(entry => new AppIndex({
-                    name: entry,
-                    exec: path.join(realPathFrom, entry),
-                    path: realPathFrom
-                }))
-        } catch(e) {
+                .map(entry => {
+                    let appIndex: AppIndex = {
+                        name: entry,
+                        exec: path.join(realPathFrom, entry),
+                        actions: [],
+                        mimeType: [],
+                        categories: [],
+                        implements: [],
+                        keywords: []
+                    }
+                    return appIndex
+                })
+                
+        } catch (e) {
             return []
         }
     }
@@ -52,7 +60,7 @@ class PathIndexer extends AppIndexer {
                 filePath,
                 fs.constants.X_OK
             )
-        } catch(e) {
+        } catch (e) {
             return false
         }
     }

@@ -3,11 +3,11 @@ import AppIndex from '../Models/AppIndex'
 import AppIndexer from './AppIndexer'
 import path from 'path'
 import XDGParse from 'xdg-parse'
+
 /**
  * Creates application indexes from .desktop files
  */
-
-class DesktopIndexer extends AppIndexer {
+class DesktopIndexer implements AppIndexer {
 
     /**
      * These files usually reside in 
@@ -17,7 +17,7 @@ class DesktopIndexer extends AppIndexer {
      */
     async index() {
         return [
-            ...await this._indexFrom('~/.local/share/applications/'),
+            ...await this._indexFrom(path.join(process.env.HOME,'.local/share/applications/')),
             ...await this._indexFrom('/usr/share/applications/'),
             ...await this._indexFrom('/usr/local/share/applications/')
         ]
@@ -29,11 +29,12 @@ class DesktopIndexer extends AppIndexer {
      */
     async _indexFrom(from) {
         try {
-            let realPathFrom = fs.realpathSync(from)
+            let realPathFrom = await fsp.realpath(from)
             let entries = await fsp.readdir(realPathFrom)
+
             return entries
                 .filter(entry => entry.match(/\.desktop$/))
-                .map(entry => 
+                .map(entry =>
                     fs.readFileSync(path.join(realPathFrom, entry), 'utf8')
                 )
                 .map(content => XDGParse(content))
@@ -51,19 +52,20 @@ class DesktopIndexer extends AppIndexer {
     _makeAppIndexFromParsedDesktopFile(content, entry) {
         let mainEntry = content[entry]
         if (mainEntry) {
-            if(!mainEntry.Actions) mainEntry.Actions = ''
-            if(!mainEntry.MimeType) mainEntry.MimeType = ''
-            if(!mainEntry.Actions) mainEntry.Actions = ''
-            if(!mainEntry.Categories) mainEntry.Categories = ''
-            if(!mainEntry.Implements) mainEntry.Implements = ''
-            if(!mainEntry.Keywords) mainEntry.Keywords = ''
-            if(!mainEntry.NoDisplay) mainEntry.NoDisplay = 'false'
-            if(!mainEntry.DBusActivatable) mainEntry.DBusActivatable = 'false'
-            if(!mainEntry.StartupNotify) mainEntry.StartupNotify = 'false'
+            if (!mainEntry.Actions) mainEntry.Actions = ''
+            if (!mainEntry.MimeType) mainEntry.MimeType = ''
+            if (!mainEntry.Actions) mainEntry.Actions = ''
+            if (!mainEntry.Categories) mainEntry.Categories = ''
+            if (!mainEntry.Implements) mainEntry.Implements = ''
+            if (!mainEntry.Keywords) mainEntry.Keywords = ''
+            if (!mainEntry.NoDisplay) mainEntry.NoDisplay = 'false'
+            if (!mainEntry.DBusActivatable) mainEntry.DBusActivatable = 'false'
+            if (!mainEntry.StartupNotify) mainEntry.StartupNotify = 'false'
 
-            return new AppIndex({
+            let appIndex: AppIndex = {
                 name: mainEntry.Name,
                 path: mainEntry.Path,
+                type: mainEntry.Type,
                 version: mainEntry.Version,
                 genericName: mainEntry.GenericName,
                 noDisplay: (mainEntry.NoDisplay == 'true') ? true : false,
@@ -75,8 +77,11 @@ class DesktopIndexer extends AppIndexer {
                 terminal: mainEntry.Terminal,
                 actions: mainEntry.Actions
                     .split(';')
-                    .map(action =>
-                        this._makeAppIndexFromParsedDesktopFile(content, 'Desktop Action ' + action)
+                    .map(
+                        action => this._makeAppIndexFromParsedDesktopFile(content, 'Desktop Action ' + action)
+                    )
+                    .filter(
+                        action => action
                     ),
                 mimeType: mainEntry.MimeType.split(';'),
                 categories: mainEntry.Categories.split(';'),
@@ -85,7 +90,9 @@ class DesktopIndexer extends AppIndexer {
                 startupNotify: (mainEntry.StartupNotify == 'true') ? true : false,
                 startupWMClass: mainEntry.StartupWMClass,
                 URL: mainEntry.URL
-            })
+            }
+
+            return appIndex
         }
     }
 }
