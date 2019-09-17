@@ -22,8 +22,6 @@ class AppIndex {
     startupWMClass?: string | undefined
     URL?: string | undefined
     type?: AppIndexType | undefined
-
-    fuzzybuzz?: string | undefined
 }
 
 export default AppIndex
