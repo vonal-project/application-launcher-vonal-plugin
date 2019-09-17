@@ -1,25 +1,30 @@
 {
-  "name": "example-vonal-test",
+  "name": "application-launcher-vonal-plugin",
   "version": "1.1.0",
-  "description": "An example of how to make a plugin to the Vonal launcher.",
+  "description": "An application launcher plugin to the Vonal launcher.",
   "main": "index.built.js",
   "devDependencies": {
-    "rollup": "^1.19.4",
-    "rollup-plugin-commonjs": "^10.0.2",
+    "rollup": "^1.20.3",
+    "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-multi-entry": "^2.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sucrase": "^2.1.0"
   },
   "scripts": {
+    "install": "electron-build-env neon build",
+    "build": "electron-build-env neon build",
     "start": "env NODE_ENV=production node_modules/.bin/rollup -c"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "electron": "^6.0.9",
+    "electron-build-env": "^0.2.0",
     "fuzzysort": "^1.1.4",
+    "neon-cli": "^0.3.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "sucrase": "^3.10.1",
-    "xdg-parse": "0.0.2"
+    "xdg-parse": "0.0.3"
   }
 }
