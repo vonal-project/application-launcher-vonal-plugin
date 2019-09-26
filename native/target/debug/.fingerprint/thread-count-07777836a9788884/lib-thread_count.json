@@ -1,0 +1,1 @@
+{"rustc":14715343205281380114,"features":"[]","target":14623733555913005260,"profile":15362060412034193088,"path":10872709659218687626,"deps":[["neon v0.3.1","neon",4363029371088411209]],"local":[{"MtimeBased":[[1568680883,270466469],".fingerprint/thread-count-07777836a9788884/dep-lib-thread_count"]}],"rustflags":[],"edition":"Edition2015"}

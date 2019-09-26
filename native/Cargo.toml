@@ -1,0 +1,17 @@
+[package]
+name = "thread-count"
+version = "0.1.0"
+authors = ["David Judge <biro97@gmail.com>"]
+license = "MIT"
+build = "build.rs"
+exclude = ["artifacts.json", "index.node"]
+
+[lib]
+name = "thread_count"
+crate-type = ["cdylib"]
+
+[build-dependencies]
+neon-build = "0.3.1"
+
+[dependencies]
+neon = "0.3.1"
