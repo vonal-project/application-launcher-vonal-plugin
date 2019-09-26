@@ -64,7 +64,8 @@ class AppLauncher {
 
         const execuatble = exec.slice(0,1)[0]
         const args = exec.slice(1)
-        spawn(execuatble, args, { detached: true, stdio: 'ignore' }).unref()
+
+        spawn('sh', ['-c', exec.join(' ').replace(/"/g,'')], { detached: true, stdio: 'ignore' }).unref()
     }
 }
 
