@@ -2,7 +2,7 @@ import AppIndex from '../Models/AppIndex'
 import { spawn } from 'child_process'
 
 class AppLauncher {
-    launch(appIndex: AppIndex) : void {
+    launch(appIndex: AppIndex, params: Array<String>): void {
         const exec: string[] = appIndex
             .exec
 
@@ -16,56 +16,53 @@ class AppLauncher {
              * the files will be copied to the local file system and %f will be expanded to point at the temporary file. 
              * Used for programs that do not understand the URL syntax. 
              */
-            .replace(/%f/,'') 
+            .replace(/%f/, '')
 
             /* 
              * %F
              * A list of files. Use for apps that can open several local files at once. 
              * Each file is passed as a separate argument to the executable program.
              */
-            .replace(/%F/,'') 
+            .replace(/%F/, '')
 
             /* A single URL. Local files may either be passed as file: URLs or as file path. */
-            .replace(/%u/,'') 
+            .replace(/%u/, '')
 
             /* 
              * A list of URLs. 
              * Each URL is passed as a separate argument to the executable program. 
              * Local files may either be passed as file: URLs or as file path. 
              */
-            .replace(/%U/,'') 
+            .replace(/%U/, '')
 
             /* 
              * The Icon key of the desktop entry expanded as two arguments, first --icon and then the value of the Icon key. 
              * Should not expand to any arguments if the Icon key is empty or missing. 
              */
-            .replace(/%i/,'') 
+            .replace(/%i/, '')
 
             /* The translated name of the application as listed in the appropriate Name key in the desktop entry. */
-            .replace(/%c/,'') 
+            .replace(/%c/, '')
 
             /* The location of the desktop file as either a URI (if for example gotten from the vfolder system) 
              * or a local filename or empty if no location is known. 
              */
-            .replace(/%k/,'') 
+            .replace(/%k/, '')
 
             /* Deprecated */
-            .replace(/%(v|m|d|D|n|N|)/,'') // Deprecated.
+            .replace(/%(v|m|d|D|n|N|)/, '') // Deprecated.
 
             /**
              * We should hold single spaces
              */
-            .replace(/ +/,' ')
+            .replace(/ +/, ' ')
 
             /**
              * Every part should be separated
              */
             .split(' ')
 
-        const execuatble = exec.slice(0,1)[0]
-        const args = exec.slice(1)
-
-        spawn('sh', ['-c', exec.join(' ').replace(/"/g,'')], { detached: true, stdio: 'ignore' }).unref()
+        spawn('sh', ['-c', [...exec, ...params].join(' ').replace(/"/g, '')], { detached: true, stdio: 'ignore' }).unref()
     }
 }
 

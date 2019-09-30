@@ -1,2 +1,5 @@
 node_modules
 index.built.js
+native/target
+native/.vscode
+native/artifacts.json

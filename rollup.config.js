@@ -2,6 +2,7 @@
 import sucrase from 'rollup-plugin-sucrase';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
+import sass from 'rollup-plugin-sass';
 
 export default {
     input: ['./src/index.tsx'],
@@ -14,7 +15,7 @@ export default {
          * rewrite imports to node_modules/{lib_name}
          */
         resolve({
-            extensions: ['.js', '.ts', '.tsx' ],
+            extensions: ['.js', '.ts', '.tsx'],
             //preferBuiltins: false,
             dedupe: ['react', 'react-dom'],
             //only: ['(!?electron)']
@@ -24,6 +25,12 @@ export default {
          */
         commonjs({
             include: 'node_modules/**',  // Default: undefined
+        }),
+        /**
+         * insert sass imports to the bundle
+         */
+        sass({
+            insert: true
         }),
         /**
          * transform code from jsx to commonjs

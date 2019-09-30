@@ -1,1 +1,0 @@
-/home/dbiro/.config/vonal/plugins/application-launcher-vonal-plugin/native/target/debug/libthread_count.so: /home/dbiro/.config/vonal/plugins/application-launcher-vonal-plugin/native/build.rs /home/dbiro/.config/vonal/plugins/application-launcher-vonal-plugin/native/src/lib.rs

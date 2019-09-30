@@ -1,0 +1,15 @@
+button {
+    text-align: left;
+
+    .name {
+        font-size: 1em;
+    }
+    
+    .exec {
+        font-size: 0.75em;
+    }
+    
+    span {
+        text-decoration: underline;
+    }
+}

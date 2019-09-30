@@ -1,17 +1,12 @@
 [package]
-name = "thread-count"
+name = "fuzzy"
 version = "0.1.0"
 authors = ["David Judge <biro97@gmail.com>"]
-license = "MIT"
-build = "build.rs"
-exclude = ["artifacts.json", "index.node"]
+edition = "2018"
 
 [lib]
-name = "thread_count"
+name = "fuzzy"
 crate-type = ["cdylib"]
 
-[build-dependencies]
-neon-build = "0.3.1"
-
 [dependencies]
-neon = "0.3.1"
+neon = { git = "https://github.com/neon-bindings/neon"}

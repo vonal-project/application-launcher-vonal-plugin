@@ -1,30 +1,33 @@
 {
-  "name": "application-launcher-vonal-plugin",
-  "version": "1.1.0",
-  "description": "An application launcher plugin to the Vonal launcher.",
-  "main": "index.built.js",
-  "devDependencies": {
-    "rollup": "^1.20.3",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-multi-entry": "^2.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-sucrase": "^2.1.0"
-  },
-  "scripts": {
-    "install": "electron-build-env neon build",
-    "build": "electron-build-env neon build",
-    "start": "env NODE_ENV=production node_modules/.bin/rollup -c"
-  },
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "electron": "^6.0.9",
-    "electron-build-env": "^0.2.0",
-    "fuzzysort": "^1.1.4",
-    "neon-cli": "^0.3.1",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
-    "sucrase": "^3.10.1",
-    "xdg-parse": "0.0.3"
-  }
+    "name": "application-launcher-vonal-plugin",
+    "version": "1.1.0",
+    "description": "An application launcher plugin to the Vonal launcher.",
+    "main": "index.built.js",
+    "devDependencies": {
+        "rollup": "^1.21.4",
+        "rollup-plugin-commonjs": "^10.1.0",
+        "rollup-plugin-multi-entry": "^2.1.0",
+        "rollup-plugin-node-resolve": "^5.2.0",
+        "rollup-plugin-sucrase": "^2.1.0"
+    },
+    "scripts": {
+        "start": "env NODE_ENV=production node_modules/.bin/rollup -c; electron-build-env neon build --release",
+        "dev": "env NODE_ENV=development NODE_MODULE_VERSION=73 node_modules/.bin/rollup -c; electron-build-env neon build"
+    },
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "cargo": "^0.8.0",
+        "electron": "^6.0.10",
+        "electron-build-env": "^0.2.0",
+        "fuzzysort": "^1.1.4",
+        "neon-cli": "^0.3.1",
+        "node-sass": "^4.12.0",
+        "react": "^16.9.0",
+        "react-dom": "^16.9.0",
+        "rollup-plugin-sass": "^1.2.2",
+        "sucrase": "^3.10.1",
+        "supports-color": "^7.1.0",
+        "xdg-parse": "0.0.3"
+    }
 }
