@@ -3,3 +3,5 @@ index.built.js
 native/target
 native/.vscode
 native/artifacts.json
+native/index.node
+.vscode
