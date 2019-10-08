@@ -34,6 +34,7 @@ async function getResults(q) {
     return results
 }
 
+
 export default async (q) => {
     let results = (await getResults(q))
         .slice(0, 5) // show only the first 5
@@ -43,7 +44,7 @@ export default async (q) => {
         ...results,
         <div className="row">
             <button onClick={load_cache} style={{ opacity: 0.5 }}>Reload application cache</button>
-            <div style={{ float: 'right', paddingRight: '0.5rem' }}>application-launcher-vonal-plugin settings</div>
+            <div style={{ float: 'right', paddingRight: '0.5rem' }}>application-launcher settings</div>
         </div>
     ]
 
