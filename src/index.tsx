@@ -36,16 +36,20 @@ async function getResults(q) {
 
 
 export default async (q) => {
-    let results = (await getResults(q))
-        .slice(0, 5) // show only the first 5
-        .map(fuzzyInfo => <ApplicationLauncherRow fuzzyInfo={fuzzyInfo} query={q} />)
+    if(q.match(/^[a-zA-Z]+(\s.*)?$/)) {
 
-    return [
-        ...results,
-        <div className="row">
-            <button onClick={load_cache} style={{ opacity: 0.5 }}>Reload application cache</button>
-            <div style={{ float: 'right', paddingRight: '0.5rem' }}>application-launcher settings</div>
-        </div>
-    ]
+        let results = (await getResults(q))
+            .slice(0, 5) // show only the first 5
+            .map(fuzzyInfo => <ApplicationLauncherRow fuzzyInfo={fuzzyInfo} query={q} />)
 
+        return [
+            ...results,
+            <div className="row">
+                <button onClick={load_cache} style={{ opacity: 0.5 }}>Reload application cache</button>
+                <div style={{ float: 'right', paddingRight: '0.5rem' }}>application-launcher settings</div>
+            </div>
+        ]
+    }
+
+    return null
 }
