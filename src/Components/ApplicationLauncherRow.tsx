@@ -13,12 +13,14 @@ class ApplicationLauncherRow extends React.PureComponent<any, any> {
 
     handleStart = (appIndex) => {
         let params = this.props.query.split(' ').slice(1)
-        this.appLauncher.launch(appIndex, params)
 
         // hide Vonal and clear query
         const globalRef: any = global
         globalRef.PluginEventHandler.send('window:hide')
         globalRef.PluginEventHandler.send('query:clear')
+
+        // launch
+        this.appLauncher.launch(appIndex, params)
     }
 
     highlight_segments(x: String, segments: Array<String>) {
