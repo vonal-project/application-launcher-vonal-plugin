@@ -3,8 +3,8 @@ extern crate neon;
 
 mod fuzzy_search;
 use fuzzy_search::{get_fuzzy_info, FuzzyInfo};
-
 use neon::prelude::*;
+use std::path::Path;
 
 fn search(mut cx: FunctionContext) -> JsResult<JsArray> {
     let query: Handle<JsString> = cx.argument(0)?;
@@ -15,11 +15,32 @@ fn search(mut cx: FunctionContext) -> JsResult<JsArray> {
 
     for (_i, app_index) in app_indices.iter().enumerate() {
         let index = app_index.downcast::<JsObject>().unwrap();
-        let name = index.get(&mut cx, "fuzzybuzz").unwrap();
+
+        let name = index.get(&mut cx, "name").unwrap();
         let name = name.downcast::<JsString>().unwrap();
         let name = name.to_string(&mut cx).unwrap().value();
-        let result = get_fuzzy_info::<Handle<JsObject>>(&query.value(), &name, index);
-        results.push(result);
+        let result_name = get_fuzzy_info::<Handle<JsObject>>(&query.value(), &name, index);
+
+        let exec = index.get(&mut cx, "exec").unwrap();
+        let exec = exec.downcast::<JsString>().unwrap();
+        let exec = exec.to_string(&mut cx).unwrap().value();
+        let exec = Path::new(&exec)
+            .file_name()
+            .and_then(|file| file.to_str())
+            .and_then(|file| Some(String::from(file)));
+
+        match exec {
+            Some(exec) => {
+                let result_exec = get_fuzzy_info::<Handle<JsObject>>(&query.value(), &exec, index);
+
+                results.push(if result_exec.fitness > result_name.fitness {
+                    result_exec
+                } else {
+                    result_name
+                });
+            }
+            None => results.push(result_name),
+        };
     }
 
     results.sort_unstable_by(

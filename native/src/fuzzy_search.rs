@@ -1,3 +1,4 @@
+use std::cmp::min;
 use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
@@ -40,8 +41,8 @@ impl Eq for InCaseSensitiveChar {}
 /// without those chars that cannot be found in the name.
 ///
 /// For e.g: We want to match `clomium` with `chromium`,
-/// but this would give us only one character long match: the `["c"]`.  
-/// Instead of this, we will find `comium` so we will get `["c", "omium"]`.   
+/// but this would give us only one character long match: the `["c"]`.
+/// Instead of this, we will find `comium` so we will get `["c", "omium"]`.
 /// So in this example, this function makes `comium` from `clomium`.
 fn get_without_uncommon_chars(query: &String, name: &String) -> (String, u64) {
     let a: HashSet<InCaseSensitiveChar> = query.chars().map(|x| InCaseSensitiveChar(x)).collect();
@@ -177,16 +178,23 @@ fn calculate_missmatch_goodness(number_of_missmatch: u64) -> f64 {
     1.0 / (number_of_missmatch as f64 + 1.0)
 }
 
-fn calculate_first_match_goodness(first_match: u64, name_length: usize) -> f64 {
-    (name_length as f64 - first_match as f64) / name_length as f64 // [0;1]
+fn calculate_first_match_goodness(first_match: u64, max_name_length: usize) -> f64 {
+    1f64 - first_match as f64 / max_name_length as f64 // [0;1]
+}
+
+fn calculate_length_goodness(name_length: usize) -> f64 {
+    1f64 / name_length as f64
 }
 
 /// Represents some information about the final result which can be used to sort our dataset
+#[derive(Debug)]
 pub struct FuzzyInfo<T> {
     pub segments: Vec<String>,
     pub fitness: f64,
     pub object: T,
 }
+
+const MAX_NAME_LENGTH: usize = 127;
 
 /// # The entry point of getting the FuzzyInfo.
 ///
@@ -196,6 +204,9 @@ pub struct FuzzyInfo<T> {
 ///
 pub fn get_fuzzy_info<T>(query: &String, name: &String, object: T) -> FuzzyInfo<T> {
     let (query, number_of_deleted_chars) = get_without_uncommon_chars(&query, &name);
+
+    let new_length = min(name.len(), MAX_NAME_LENGTH);
+    let name = &name[..new_length].to_owned();
 
     if query.len() == 0 || name.len() == 0 {
         return FuzzyInfo {
@@ -207,20 +218,23 @@ pub fn get_fuzzy_info<T>(query: &String, name: &String, object: T) -> FuzzyInfo<
 
     let segments_info = get_matching_segments(&query, &name);
     let first_match_goodness =
-        calculate_first_match_goodness(segments_info.first_match, name.len());
+        calculate_first_match_goodness(segments_info.first_match, MAX_NAME_LENGTH);
     let segment_goodness = calculate_segment_goodness(
         &segments_info.segments,
         query.len() + number_of_deleted_chars as usize,
     );
     let common_char_goodness = calculate_common_char_goodness(number_of_deleted_chars, query.len());
     let missmatch_goodness = calculate_missmatch_goodness(segments_info.missmatch_count);
+    let length_goodness = calculate_length_goodness(name.len());
 
     FuzzyInfo {
         segments: segments_info.segments,
-        fitness: segment_goodness
-            * common_char_goodness
-            * missmatch_goodness
-            * first_match_goodness,
+        fitness: (segment_goodness
+            + common_char_goodness
+            + missmatch_goodness
+            + length_goodness
+            + first_match_goodness)
+            / 5f64,
         object,
     }
 }
@@ -242,7 +256,7 @@ mod tests {
     }
 
     #[test]
-    fn test_fitness() {
+    fn test_fitness1() {
         let info1 = get_fuzzy_info::<String>(
             &String::from("clo"),
             &String::from("chromium"),
@@ -250,14 +264,17 @@ mod tests {
         );
         let info2 = get_fuzzy_info::<String>(
             &String::from("clo"),
-            &String::from("chroot"),
+            &String::from("chrootas"),
             String::from(""),
         );
         let info3 = get_fuzzy_info::<String>(
             &String::from("clo"),
-            &String::from("chromaprint"),
+            &String::from("chromapr"),
             String::from(""),
         );
+        println!("{:?}", info1);
+        println!("{:?}", info2);
+        println!("{:?}", info3);
 
         assert_eq!(info1.segments, vec!["c", "o"]);
         assert_eq!(info1.fitness, info2.fitness);
@@ -285,12 +302,30 @@ mod tests {
     fn test_fitness3() {
         let info1 = get_fuzzy_info::<String>(
             &String::from("chromim"),
-            &String::from("comm"),
+            &String::from("commmium Web Browser"),
             String::from(""),
         );
         let info2 = get_fuzzy_info::<String>(
             &String::from("chromim"),
             &String::from("Chromium Web Browser"),
+            String::from(""),
+        );
+        println!("{}", info1.fitness);
+        println!("{}", info2.fitness);
+
+        assert!(info1.fitness < info2.fitness);
+    }
+
+    #[test]
+    fn test_shorter_first() {
+        let info1 = get_fuzzy_info::<String>(
+            &String::from("files"),
+            &String::from("filess"),
+            String::from(""),
+        );
+        let info2 = get_fuzzy_info::<String>(
+            &String::from("files"),
+            &String::from("files"),
             String::from(""),
         );
         println!("{}", info1.fitness);
